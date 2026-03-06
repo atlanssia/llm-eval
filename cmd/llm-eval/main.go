@@ -13,8 +13,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/atlanssia/llm-eval/internal/api"
 	"github.com/atlanssia/llm-eval/internal/config"
 	"github.com/atlanssia/llm-eval/internal/repository"
+	"github.com/atlanssia/llm-eval/internal/service"
 	"github.com/atlanssia/llm-eval/internal/stream"
 	_ "modernc.org/sqlite"
 )
@@ -59,23 +61,21 @@ func main() {
 	streamHub := stream.NewHub(ctx, logger)
 	defer streamHub.Close()
 
-	// TODO: Initialize services
+	// Initialize services (placeholders for now)
+	evalSvc := service.NewEvaluationService()
+	datasetSvc := service.NewDatasetService()
+	modelSvc := service.NewModelService()
+
 	_ = evalRepo
 	_ = resultRepo
-	_ = streamHub
 
-	// TODO: Setup router
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, `{"status":"ok","version":"%s"}`, version)
-	})
+	// Setup router with middleware
+	handler := api.NewRouter(evalSvc, datasetSvc, modelSvc, streamHub, cfg, logger)
 
 	// HTTP server with timeouts
 	srv := &http.Server{
 		Addr:         cfg.Server.Addr,
-		Handler:      mux,
+		Handler:      handler,
 		ReadTimeout:  time.Duration(cfg.Server.ReadTimeout) * time.Second,
 		WriteTimeout: time.Duration(cfg.Server.WriteTimeout) * time.Second,
 		IdleTimeout:  time.Duration(cfg.Server.IdleTimeout) * time.Second,
