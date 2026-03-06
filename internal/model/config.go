@@ -23,6 +23,12 @@ func (c *ModelConfig) Validate() error {
 	if c.Endpoint == "" {
 		return errors.New("model endpoint is required")
 	}
+	if c.Timeout <= 0 {
+		return errors.New("model timeout must be greater than 0")
+	}
+	if c.MaxRetries < 0 {
+		return errors.New("model max retries must be greater than or equal to 0")
+	}
 	return nil
 }
 
