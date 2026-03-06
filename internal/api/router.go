@@ -1,7 +1,9 @@
 package api
 
 import (
+	"io/fs"
 	"log/slog"
+	"net/http"
 
 	"github.com/atlanssia/llm-eval/internal/api/handler"
 	"github.com/atlanssia/llm-eval/internal/api/middleware"
@@ -20,6 +22,7 @@ func NewRouter(
 	streamHub *stream.Hub,
 	cfg *model.Config,
 	logger *slog.Logger,
+	embeddedFS fs.FS,
 ) *chi.Mux {
 	r := chi.NewRouter()
 
@@ -58,6 +61,20 @@ func NewRouter(
 		r.Get("/evaluations/{id}", handler.GetEvaluation(evalSvc))
 		r.Get("/evaluations/{id}/stream", handler.StreamEvaluation(evalSvc, streamHub))
 	})
+
+	// Serve React SPA (from embedded filesystem or fallback to local filesystem)
+	if embeddedFS != nil {
+		fileServer := http.FileServer(http.FS(embeddedFS))
+		r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+			fileServer.ServeHTTP(w, r)
+		})
+	} else {
+		// Fallback to local filesystem for development
+		fileServer := http.FileServer(http.Dir("web/dist"))
+		r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+			fileServer.ServeHTTP(w, r)
+		})
+	}
 
 	return r
 }

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
@@ -69,8 +70,13 @@ func main() {
 	_ = evalRepo
 	_ = resultRepo
 
+	// Get embedded frontend (if available)
+	var embeddedFS fs.FS
+	// Note: For now, we'll use the filesystem fallback
+	// TODO: Implement proper embed support
+
 	// Setup router with middleware
-	handler := api.NewRouter(evalSvc, datasetSvc, modelSvc, streamHub, cfg, logger)
+	handler := api.NewRouter(evalSvc, datasetSvc, modelSvc, streamHub, cfg, logger, embeddedFS)
 
 	// HTTP server with timeouts
 	srv := &http.Server{
