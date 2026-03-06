@@ -7,6 +7,8 @@
 *.dll
 *.so
 *.dylib
+bin/
+llm-eval
 
 # Test binary, built with `go test -c`
 *.test
@@ -16,6 +18,8 @@
 coverage.*
 *.coverprofile
 profile.cov
+coverage.out
+coverage.html
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -23,9 +27,22 @@ profile.cov
 # Go workspace file
 go.work
 go.work.sum
+/workspace/
 
 # env file
 .env
+.env.local
+
+# Config files
+config.yaml
+!configs/*.example
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+data/
+!data/.gitkeep
 
 # Node modules
 node_modules/

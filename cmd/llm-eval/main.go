@@ -62,13 +62,10 @@ func main() {
 	streamHub := stream.NewHub(ctx, logger)
 	defer streamHub.Close()
 
-	// Initialize services (placeholders for now)
-	evalSvc := service.NewEvaluationService()
+	// Initialize services with proper dependencies
+	evalSvc := service.NewEvaluationService(evalRepo, resultRepo, streamHub, logger)
 	datasetSvc := service.NewDatasetService()
 	modelSvc := service.NewModelService()
-
-	_ = evalRepo
-	_ = resultRepo
 
 	// Get embedded frontend (if available)
 	var embeddedFS fs.FS
