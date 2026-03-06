@@ -1,0 +1,21 @@
+server:
+  addr: "0.0.0.0:8080"
+  read_timeout: 30
+  write_timeout: 30
+  idle_timeout: 120
+
+database:
+  path: "./data/llm-eval.db"
+
+data_dir: "./data"
+
+auth:
+  enabled: false
+  password: ""
+
+models:
+  - name: "gpt-4"
+    endpoint: "https://api.openai.com/v1/chat/completions"
+    api_key: "${OPENAI_API_KEY}"
+    timeout: 60
+    max_retries: 2
