@@ -4,10 +4,10 @@ package stream
 type EventType string
 
 const (
-	EventTypeProgress          EventType = "progress"
-	EventTypeModelComplete     EventType = "model_complete"
+	EventTypeProgress           EventType = "progress"
+	EventTypeModelComplete      EventType = "model_complete"
 	EventTypeEvaluationComplete EventType = "evaluation_complete"
-	EventTypeError             EventType = "error"
+	EventTypeError              EventType = "error"
 )
 
 // Event represents an SSE event
@@ -18,6 +18,11 @@ type Event struct {
 
 // NewProgressEvent creates a progress event
 func NewProgressEvent(evalID, model, dataset string, current, total int) Event {
+	var progress float64
+	if total > 0 {
+		progress = float64(current) / float64(total) * 100
+	}
+
 	return Event{
 		Type: EventTypeProgress,
 		Data: map[string]interface{}{
@@ -26,7 +31,7 @@ func NewProgressEvent(evalID, model, dataset string, current, total int) Event {
 			"dataset":       dataset,
 			"current":       current,
 			"total":         total,
-			"progress":      float64(current) / float64(total) * 100,
+			"progress":      progress,
 		},
 	}
 }
